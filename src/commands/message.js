@@ -242,7 +242,7 @@ class CommandMessage {
 
 				const invite = this.client.options.invite;
 				return this.reply(stripIndents`
-					При выполнении команды **\`${this.name}\`** произошла ошибка: **\`${err.name}: ${err.message}\`**
+					При выполнении команды **\`${this.command.name}\`** произошла ошибка: **\`${err.name}: ${err.message}\`**
 					Трассировка стека: \`\`\`javascript
 					${oneLine`
 						${err.stack}\`\`\`Пожалуйста, свяжитесь с
