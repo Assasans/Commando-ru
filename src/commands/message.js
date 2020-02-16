@@ -244,8 +244,8 @@ class CommandMessage {
 				return this.reply(stripIndents`
 					При выполнении команды **\`${this.command.name}\`** произошла ошибка: **\`${err.name}: ${err.message}\`**
 					Трассировка стека: \`\`\`javascript
-					${oneLine`
-						${err.stack}\`\`\`Пожалуйста, свяжитесь с
+					${err.stack}\`\`\`${oneLine`
+						Пожалуйста, свяжитесь с
 						${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
 					`}
 				`);
