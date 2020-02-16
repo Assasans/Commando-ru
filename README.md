@@ -33,7 +33,9 @@
 
 **Необходима версия Node 8.0.0 или выше.**
 
-`npm install Assasans/Commando-ru#djs-v11`
+NPM: `npm install @assasans/discord.js-commando`
+
+GitHub: `npm install Assasans/Commando-ru#djs-v11`
 
 ## Документация
 
