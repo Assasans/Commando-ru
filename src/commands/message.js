@@ -236,16 +236,18 @@ class CommandMessage {
 			} else {
 				const owners = this.client.owners;
 				let ownerList = owners ? owners.map((usr, i) => {
-					const or = i === owners.length - 1 && owners.length > 1 ? 'or ' : '';
+					const or = i === owners.length - 1 && owners.length > 1 ? 'или ' : '';
 					return `${or}${discord.escapeMarkdown(usr.username)}#${usr.discriminator}`;
 				}).join(owners.length > 2 ? ', ' : ' ') : '';
 
 				const invite = this.client.options.invite;
 				return this.reply(stripIndents`
-					При выполнении команды \`${this.name} произошла ошибка\`: \`${err.name}: ${err.message}\`
+					При выполнении команды **\`${this.name}\`** произошла ошибка: **\`${err.name}: ${err.message}\`**
 					Трассировка стека: \`\`\`javascript
-					${err.stack}\`\`\`
-					Пожалуйста, свяжитесь с ${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
+					${oneLine`
+						${err.stack}\`\`\`Пожалуйста, свяжитесь с
+						${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
+					`}
 				`);
 			}
 		}
