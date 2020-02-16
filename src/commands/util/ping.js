@@ -19,8 +19,7 @@ module.exports = class PingCommand extends Command {
 		if(!msg.editable) {
 			const pingMsg = await msg.reply('Проверяем задержку...');
 			return pingMsg.edit(stripIndents`
-				${msg.channel.type !== 'dm' ? `${msg.author},` : ''}
-				Ответ от серверов получен!
+				${msg.channel.type !== 'dm' ? `${msg.author}, ` : ''}Ответ от серверов получен!
 				Задержка на стороне бота: ${pingMsg.createdTimestamp - msg.createdTimestamp} мс.
 				${this.client.ping ? `Задержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
 			`);
