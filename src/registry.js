@@ -390,7 +390,7 @@ class CommandRegistry {
 
 		// Find all matches
 		const lcSearch = searchString.toLowerCase();
-		const matchedGroups = this.groups.filterArray(
+		const matchedGroups = this.groups.filter(
 			exact ? groupFilterExact(lcSearch) : groupFilterInexact(lcSearch)
 		);
 		if(exact) return matchedGroups;
@@ -431,11 +431,11 @@ class CommandRegistry {
 	 * @return {Command[]} All commands that are found
 	 */
 	findCommands(searchString = null, exact = false, message = null) {
-		if(!searchString) return message ? this.commands.filterArray(cmd => cmd.isUsable(message)) : this.commands;
+		if(!searchString) return message ? this.commands.filter(cmd => cmd.isUsable(message)) : this.commands;
 
 		// Find all matches
 		const lcSearch = searchString.toLowerCase();
-		const matchedCommands = this.commands.filterArray(
+		const matchedCommands = this.commands.filter(
 			exact ? commandFilterExact(lcSearch) : commandFilterInexact(lcSearch)
 		);
 		if(exact) return matchedCommands;

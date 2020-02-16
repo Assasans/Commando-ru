@@ -20,7 +20,7 @@ class MemberArgumentType extends ArgumentType {
 			}
 		}
 		const search = value.toLowerCase();
-		let members = msg.guild.members.filterArray(memberFilterInexact(search));
+		let members = msg.guild.members.filter(memberFilterInexact(search));
 		if(members.length === 0) return false;
 		if(members.length === 1) {
 			if(arg.oneOf && !arg.oneOf.includes(members[0].id)) return false;
@@ -43,7 +43,7 @@ class MemberArgumentType extends ArgumentType {
 		const matches = value.match(/^(?:<@!?)?([0-9]+)>?$/);
 		if(matches) return msg.guild.member(matches[1]) || null;
 		const search = value.toLowerCase();
-		const members = msg.guild.members.filterArray(memberFilterInexact(search));
+		const members = msg.guild.members.filter(memberFilterInexact(search));
 		if(members.length === 0) return null;
 		if(members.length === 1) return members[0];
 		const exactMembers = members.filter(memberFilterExact(search));

@@ -21,7 +21,7 @@ class UserArgumentType extends ArgumentType {
 		}
 		if(!msg.guild) return false;
 		const search = value.toLowerCase();
-		let members = msg.guild.members.filterArray(memberFilterInexact(search));
+		let members = msg.guild.members.filter(memberFilterInexact(search));
 		if(members.length === 0) return false;
 		if(members.length === 1) {
 			if(arg.oneOf && !arg.oneOf.includes(members[0].id)) return false;
@@ -45,7 +45,7 @@ class UserArgumentType extends ArgumentType {
 		if(matches) return msg.client.users.get(matches[1]) || null;
 		if(!msg.guild) return null;
 		const search = value.toLowerCase();
-		const members = msg.guild.members.filterArray(memberFilterInexact(search));
+		const members = msg.guild.members.filter(memberFilterInexact(search));
 		if(members.length === 0) return null;
 		if(members.length === 1) return members[0].user;
 		const exactMembers = members.filter(memberFilterExact(search));
