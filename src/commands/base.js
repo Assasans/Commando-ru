@@ -252,17 +252,17 @@ class Command {
 		if(ownerOverride && this.client.isOwner(message.author)) return true;
 
 		if(this.ownerOnly && (ownerOverride || !this.client.isOwner(message.author))) {
-			return `The \`${this.name}\` command can only be used by the bot owner.`;
+			return `Команда \`${this.name}\` может быть использована только владельцами бота.`;
 		}
 
 		if(message.channel.type === 'text' && this.userPermissions) {
 			const missing = message.channel.permissionsFor(message.author).missing(this.userPermissions);
 			if(missing.length > 0) {
 				if(missing.length === 1) {
-					return `The \`${this.name}\` command requires you to have the "${permissions[missing[0]]}" permission.`;
+					return `Для выполнения команды \`${this.name}\` необходимо иметь право "${permissions[missing[0]]}".`;
 				}
 				return oneLine`
-					The \`${this.name}\` command requires you to have the following permissions:
+					Для выполнения команды \`${this.name}\` необходимо иметь следующие права:
 					${missing.map(perm => permissions[perm]).join(', ')}
 				`;
 			}
@@ -304,28 +304,29 @@ class Command {
 	onBlock(message, reason, data) {
 		switch(reason) {
 			case 'guildOnly':
-				return message.reply(`The \`${this.name}\` command must be used in a server channel.`);
+				return message.reply(`Команда \`${this.name}\` может быть выполнена только на сервера.`);
 			case 'nsfw':
-				return message.reply(`The \`${this.name}\` command can only be used in NSFW channels.`);
+				return message.reply(`КомандаThe \`${this.name}\` может быть выполнена только в NSFW каналах.`);
 			case 'permission': {
 				if(data.response) return message.reply(data.response);
-				return message.reply(`You do not have permission to use the \`${this.name}\` command.`);
+				return message.reply(`У вас нат прав для выполнения команды \`${this.name}\`.`);
 			}
 			case 'clientPermissions': {
 				if(data.missing.length === 1) {
 					return message.reply(
-						`I need the "${permissions[data.missing[0]]}" permission for the \`${this.name}\` command to work.`
+						`Боту необходимо иметь право "${permissions[data.missing[0]]}" для выполнения команды \`${this.name}\`.`
 					);
 				}
 				return message.reply(oneLine`
-					I need the following permissions for the \`${this.name}\` command to work:
+					Для выполнения команды \`${this.name}\` боту необходимо иметь следующие права:
 					${data.missing.map(perm => permissions[perm]).join(', ')}
 				`);
 			}
 			case 'throttling': {
-				return message.reply(
-					`You may not use the \`${this.name}\` command again for another ${data.remaining.toFixed(1)} seconds.`
-				);
+				return message.reply(oneLine`
+					Для повторного выполнения команды \`${this.name}\`
+					вам необходимо подождать ${data.remaining.toFixed(1)} секунд.
+				`);
 			}
 			default:
 				return null;
@@ -345,15 +346,16 @@ class Command {
 	onError(err, message, args, fromPattern, result) { // eslint-disable-line no-unused-vars
 		const owners = this.client.owners;
 		const ownerList = owners ? owners.map((usr, i) => {
-			const or = i === owners.length - 1 && owners.length > 1 ? 'or ' : '';
+			const or = i === owners.length - 1 && owners.length > 1 ? 'или ' : '';
 			return `${or}${escapeMarkdown(usr.username)}#${usr.discriminator}`;
 		}).join(owners.length > 2 ? ', ' : ' ') : '';
 
 		const invite = this.client.options.invite;
 		return message.reply(stripIndents`
-			An error occurred while running the command: \`${err.name}: ${err.message}\`
-			You shouldn't ever receive an error like this.
-			Please contact ${ownerList || 'the bot owner'}${invite ? ` in this server: ${invite}` : '.'}
+			При выполнении команды \`${this.name} произошла ошибка\`: \`${err.name}: ${err.message}\`
+			Трассировка стека: \`\`\`javascript
+			${err.stack}\`\`\`
+			Пожалуйста, свяжитесь с ${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
 		`);
 	}
 
@@ -492,7 +494,7 @@ class Command {
 		let mentionPart;
 		if(user) mentionPart = `\`\`@${user.username.replace(/ /g, '\xa0')}#${user.discriminator}\xa0${nbcmd}\`\``;
 
-		return `${prefixPart || ''}${prefix && user ? ' or ' : ''}${mentionPart || ''}`;
+		return `${prefixPart || ''}${prefix && user ? ' или ' : ''}${mentionPart || ''}`;
 	}
 
 	/**

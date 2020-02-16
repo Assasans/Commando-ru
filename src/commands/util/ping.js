@@ -7,22 +7,22 @@ module.exports = class PingCommand extends Command {
 			name: 'ping',
 			group: 'util',
 			memberName: 'ping',
-			description: 'Checks the bot\'s ping to the Discord server.',
+			description: 'Проверяет задержку соединения от бота с серверам Дискорда',
 			throttling: {
-				usages: 5,
-				duration: 10
+				usages: 2,
+				duration: 5
 			}
 		});
 	}
 
 	async run(msg) {
-		const pingMsg = await msg.reply('Pinging...');
+		const pingMsg = await msg.reply('Проверяем задержку...');
 		return pingMsg.edit(oneLine`
 			${msg.channel.type !== 'dm' ? `${msg.author},` : ''}
-			Pong! The message round-trip took ${
+			Ответ от серверов получен!\nЗадержка на стороне бота: ${
 				(pingMsg.editedTimestamp || pingMsg.createdTimestamp) - (msg.editedTimestamp || msg.createdTimestamp)
-			}ms.
-			${this.client.ws.ping ? `The heartbeat ping is ${Math.round(this.client.ws.ping)}ms.` : ''}
+			} мс.
+			${this.client.ws.ping ? `\nЗадержка в WebSocket соединении: ${Math.round(this.client.ws.ping)} мс.` : ''}
 		`);
 	}
 };

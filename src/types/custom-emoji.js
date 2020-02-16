@@ -20,7 +20,7 @@ class CustomEmojiArgumentType extends ArgumentType {
 		if(exactEmojis.size > 0) emojis = exactEmojis;
 		return emojis.size <= 15 ?
 			`${disambiguation(emojis.map(emoji => escapeMarkdown(emoji.name)), 'emojis', null)}\n` :
-			'Multiple emojis found. Please be more specific.';
+			'Найдено несколько эмодзи. Пожалуйста, укажите более точное название.';
 	}
 
 	parse(value, msg) {

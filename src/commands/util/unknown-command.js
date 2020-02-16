@@ -6,8 +6,8 @@ module.exports = class UnknownCommandCommand extends Command {
 			name: 'unknown-command',
 			group: 'util',
 			memberName: 'unknown-command',
-			description: 'Displays help information for when an unknown command is used.',
-			examples: ['unknown-command kickeverybodyever'],
+			description: 'Отображает ошибку, когда выполнена неизвестная команда.',
+			examples: ['unknown-command this-command-does-not-exists'],
 			unknown: true,
 			hidden: true
 		});
@@ -15,11 +15,11 @@ module.exports = class UnknownCommandCommand extends Command {
 
 	run(msg) {
 		return msg.reply(
-			`Unknown command. Use ${msg.anyUsage(
+			`Неизвестная команда. Напишите ${msg.anyUsage(
 				'help',
 				msg.guild ? undefined : null,
 				msg.guild ? undefined : null
-			)} to view the command list.`
+			)}, чтобы посмотреть список доступных команд.`
 		);
 	}
 };

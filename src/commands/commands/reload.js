@@ -8,21 +8,20 @@ module.exports = class ReloadCommandCommand extends Command {
 			aliases: ['reload-command'],
 			group: 'commands',
 			memberName: 'reload',
-			description: 'Reloads a command or command group.',
+			description: 'Перезагужает команду или группу команд.',
 			details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command or command group.
-				Providing a command group will reload all of the commands in that group.
-				Only the bot owner(s) may use this command.
+				Аргументом должно быть название (частичное или полное) или ID команды или группы команд.
+				Указание группы команд перезагрузит все команды, находящиеся в ней.
+				Только владельцы бота могу использовать эту команду.
 			`,
 			examples: ['reload some-command'],
-			ownerOnly: true,
 			guarded: true,
-
+			ownerOnly: true,
 			args: [
 				{
 					key: 'cmdOrGrp',
 					label: 'command/group',
-					prompt: 'Which command or group would you like to reload?',
+					prompt: 'Какую команду или группу команд вы хотите перезагрузить?',
 					type: 'group|command'
 				}
 			]
@@ -45,21 +44,27 @@ module.exports = class ReloadCommandCommand extends Command {
 				this.client.emit('warn', `Error when broadcasting command reload to other shards`);
 				this.client.emit('error', err);
 				if(isCmd) {
-					await msg.reply(`Reloaded \`${cmdOrGrp.name}\` command, but failed to reload on other shards.`);
+					await msg.reply(oneLine`
+						Команда \`${cmdOrGrp.name}\` успешно перезагужена на текущем шарде,
+						но её перезагрузка не удалась на других шардах.
+					`);
 				} else {
-					await msg.reply(
-						`Reloaded all of the commands in the \`${cmdOrGrp.name}\` group, but failed to reload on other shards.`
-					);
+					await msg.reply(oneLine`
+						Перезагружены все команды в группе \`${cmdOrGrp.name}\` на текущем шарде,
+						но их перезагрузка не удалась на других шардах.
+					`);
 				}
 				return null;
 			}
 		}
 
 		if(isCmd) {
-			await msg.reply(`Reloaded \`${cmdOrGrp.name}\` command${this.client.shard ? ' on all shards' : ''}.`);
+			await msg.reply(`
+				Команда \`${cmdOrGrp.name}\` успешно перезагружена${this.client.shard ? ' на всех шардах' : ''}.
+			`);
 		} else {
 			await msg.reply(
-				`Reloaded all of the commands in the \`${cmdOrGrp.name}\` group${this.client.shard ? ' on all shards' : ''}.`
+				`Перезагружены все команды в группе \`${cmdOrGrp.name}\` ${this.client.shard ? ' на всех шардах' : ''}.`
 			);
 		}
 		return null;

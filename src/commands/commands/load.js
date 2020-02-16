@@ -9,25 +9,24 @@ module.exports = class LoadCommandCommand extends Command {
 			aliases: ['load-command'],
 			group: 'commands',
 			memberName: 'load',
-			description: 'Loads a new command.',
+			description: 'Загружает новую команду.',
 			details: oneLine`
-				The argument must be full name of the command in the format of \`group:memberName\`.
-				Only the bot owner(s) may use this command.
+				Аргументом должно быть полное название команды в формате \`group:memberName\`.
+				Только владельцы бота могу использовать эту команду.
 			`,
 			examples: ['load some-command'],
-			ownerOnly: true,
 			guarded: true,
-
+			ownerOnly: true,
 			args: [
 				{
 					key: 'command',
-					prompt: 'Which command would you like to load?',
+					prompt: 'Какую команду вы хотите загрузить?',
 					validate: val => new Promise(resolve => {
 						if(!val) return resolve(false);
 						const split = val.split(':');
 						if(split.length !== 2) return resolve(false);
 						if(this.client.registry.findCommands(val).length > 0) {
-							return resolve('That command is already registered.');
+							return resolve('Данная команда уже зарегистрирована.');
 						}
 						const cmdPath = this.client.registry.resolveCommandPath(split[0], split[1]);
 						fs.access(cmdPath, fs.constants.R_OK, err => err ? resolve(false) : resolve(true));
@@ -60,12 +59,15 @@ module.exports = class LoadCommandCommand extends Command {
 			} catch(err) {
 				this.client.emit('warn', `Error when broadcasting command load to other shards`);
 				this.client.emit('error', err);
-				await msg.reply(`Loaded \`${command.name}\` command, but failed to load on other shards.`);
+				await msg.reply(oneLine`
+					Команда \`${command.name}\` успешно загружена на текущем шарде,
+					но её загрузка не удалась на других шардах.
+				`);
 				return null;
 			}
 		}
 
-		await msg.reply(`Loaded \`${command.name}\` command${this.client.shard ? ' on all shards' : ''}.`);
+		await msg.reply(`Команда \`${command.name}\` успешно загружена${this.client.shard ? ' на всех шардах' : ''}.`);
 		return null;
 	}
 };

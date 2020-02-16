@@ -13,14 +13,13 @@ module.exports = class EvalCommand extends Command {
 			name: 'eval',
 			group: 'util',
 			memberName: 'eval',
-			description: 'Executes JavaScript code.',
-			details: 'Only the bot owner(s) may use this command.',
+			description: 'Выполняет JavaScript код.',
+			details: 'Только владельцы бота могу использовать эту команду.',
 			ownerOnly: true,
-
 			args: [
 				{
 					key: 'script',
-					prompt: 'What code would you like to evaluate?',
+					prompt: 'Какой код вы хотите выполнить?',
 					type: 'string'
 				}
 			]
@@ -38,7 +37,7 @@ module.exports = class EvalCommand extends Command {
 		const lastResult = this.lastResult;
 		const doReply = val => {
 			if(val instanceof Error) {
-				msg.reply(`Callback error: \`${val}\``);
+				msg.reply(`Ошибка в фунции обратного вызова: \`${val}\``);
 			} else {
 				const result = this.makeResultMessages(val, process.hrtime(this.hrStart));
 				if(Array.isArray(result)) {
@@ -57,7 +56,7 @@ module.exports = class EvalCommand extends Command {
 			this.lastResult = eval(args.script);
 			hrDiff = process.hrtime(hrStart);
 		} catch(err) {
-			return msg.reply(`Error while evaluating: \`${err}\``);
+			return msg.reply(`При выполнение приозошла ошибка: \`${err}\``);
 		}
 
 		// Prepare for callback time and respond
@@ -73,7 +72,7 @@ module.exports = class EvalCommand extends Command {
 	makeResultMessages(result, hrDiff, input = null) {
 		const inspected = util.inspect(result, { depth: 0 })
 			.replace(nlPattern, '\n')
-			.replace(this.sensitivePattern, '--snip--');
+			.replace(this.sensitivePattern, '--sensitive--');
 		const split = inspected.split('\n');
 		const last = inspected.length - 1;
 		const prependPart = inspected[0] !== '{' && inspected[0] !== '[' && inspected[0] !== "'" ? split[0] : inspected[0];
@@ -84,14 +83,14 @@ module.exports = class EvalCommand extends Command {
 		const append = `\n${appendPart}\n\`\`\``;
 		if(input) {
 			return discord.splitMessage(tags.stripIndents`
-				*Executed in ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000}ms.*
+				Код был выполнен за ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000} мс.
 				\`\`\`javascript
 				${inspected}
 				\`\`\`
 			`, { maxLength: 1900, prepend, append });
 		} else {
 			return discord.splitMessage(tags.stripIndents`
-				*Callback executed after ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000}ms.*
+				Функция обратного вызова была выполнена после ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000} мс.
 				\`\`\`javascript
 				${inspected}
 				\`\`\`

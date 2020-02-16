@@ -179,10 +179,10 @@ class Argument {
 
 			// Prompt the user for a new value
 			prompts.push(await msg.reply(stripIndents`
-				${empty ? this.prompt : valid ? valid : `You provided an invalid ${this.label}. Please try again.`}
+				${empty ? this.prompt : valid ? valid : `Вы указали неверный агрумент \`${this.label}\`. Попробуйте снова.`}
 				${oneLine`
-					Respond with \`cancel\` to cancel the command.
-					${wait ? `The command will automatically be cancelled in ${this.wait} seconds.` : ''}
+					Напишите \`cancel\` для отмены выполнения команды.
+					${wait ? `Выполнение команды будет автоматически отменено через ${this.wait} секунд.` : ''}
 				`}
 			`));
 
@@ -265,21 +265,22 @@ class Argument {
 					const escaped = escapeMarkdown(val).replace(/@/g, '@\u200b');
 					prompts.push(await msg.reply(stripIndents`
 						${valid ? valid : oneLine`
-							You provided an invalid ${this.label},
-							"${escaped.length < 1850 ? escaped : '[too long to show]'}".
-							Please try again.
+							Вы указали неверный аргумент \`${this.label}\`,
+							"${escaped.length < 1800 ? escaped : '[too long to show]'}".
+							Попробуйте снова.
 						`}
 						${oneLine`
-							Respond with \`cancel\` to cancel the command, or \`finish\` to finish entry up to this point.
-							${wait ? `The command will automatically be cancelled in ${this.wait} seconds.` : ''}
+							Напишите \`cancel\` для отмены выполнения команды или \`finish\` для завершения ввода аргументов.
+							${wait ? `Выполнение команды будет автоматически отменено через ${this.wait} секунд.` : ''}
 						`}
 					`));
 				} else if(results.length === 0) {
 					prompts.push(await msg.reply(stripIndents`
 						${this.prompt}
 						${oneLine`
-							Respond with \`cancel\` to cancel the command, or \`finish\` to finish entry.
-							${wait ? `The command will automatically be cancelled in ${this.wait} seconds, unless you respond.` : ''}
+							Напишите \`cancel\` для отмены выполнения команды или \`finish\` для завершения ввода аргументов.
+							${wait ? `Если вы ничего не напишите - выполнение команды будет автоматически
+								отменено через ${this.wait} секунд.` : ''}
 						`}
 					`));
 				}
