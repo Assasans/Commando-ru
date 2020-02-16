@@ -26,8 +26,9 @@ module.exports = class PingCommand extends Command {
 		} else {
 			await msg.edit('Проверяем задержку...');
 			return msg.edit(stripIndents`
-				Ответ от серверов получен!\nЗадержка на стороне бота: ${msg.editedTimestamp - msg.createdTimestamp} мс.
-				${this.client.ping ? `\nЗадержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
+				Ответ от серверов получен!
+				Задержка на стороне бота: ${msg.editedTimestamp - msg.createdTimestamp} мс.
+				${this.client.ping ? `Задержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
 			`);
 		}
 	}
