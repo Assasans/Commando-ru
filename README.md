@@ -38,4 +38,5 @@
 ## Документация
 
 [Официальная документация Commando (англ.)](https://discord.js.org/#/docs/commando)
+
 [Официальная документация DiscordJS (англ.)](https://discord.js.org/#/docs)
