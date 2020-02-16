@@ -56,7 +56,7 @@ module.exports = class HelpCommand extends Command {
 					messages.push(await msg.direct(help));
 					if(msg.channel.type !== 'dm') {
 						messages.push(await msg.reply(oneLine`
-							Успешно отправлено личное сообщение с подробной информацией про команду.
+							Личное сообщение с подробной информацией про команду отправлено.
 						`));
 					}
 				} catch(err) {
@@ -113,7 +113,7 @@ module.exports = class HelpCommand extends Command {
 				`, { split: true }));
 				if(msg.channel.type !== 'dm') {
 					messages.push(await msg.reply(oneLine`
-						Успешно отправлено личное сообщение со списком доступных команд.
+						Личное сообщение со списком доступных команд отправлено.
 					`));
 				}
 			} catch(err) {
