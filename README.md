@@ -1,38 +1,41 @@
-# Commando
-[![Discord](https://discordapp.com/api/guilds/222078108977594368/embed.png)](https://discord.gg/bRCvFy9)
-[![Downloads](https://img.shields.io/npm/dt/discord.js-commando.svg)](https://www.npmjs.com/package/discord.js-commando)
-[![Version](https://img.shields.io/npm/v/discord.js-commando.svg)](https://www.npmjs.com/package/discord.js-commando)
-[![Dependency status](https://david-dm.org/discordjs/Commando.svg)](https://david-dm.org/discordjs/Commando)
-[![Build status](https://travis-ci.org/discordjs/Commando.svg)](https://travis-ci.org/discordjs/Commando)
+# Commando RU
+[![Dependency status](https://img.shields.io/github/languages/code-size/Assasans/Commando-ru)](https://david-dm.org/discordjs/Commando)
 
-## About
-Commando is the official command framework for [discord.js](https://github.com/discordjs/discord.js).
-It is flexible, fully object-oriented, easy to use, and makes it trivial to create your own powerful commands.
-Additionally, it makes full use of ES2017's `async`/`await` functionality for clear, concise code that is simple to write and easy to comprehend.
+## Описание
 
-## Features
-- Plain command names and aliases
-- Regular expression triggers
-- Robust parsing of arguments (with "quoted strings" support)
-- Sophisticated argument system (optional)
-	* Automatic prompting for arguments that aren't provided
-	* Type system with rules, automatic validation, and parsing to usable values
-		- Basic types (string, integer, float, boolean)
-		- Discord objects (user, member, role, channel, message)
-		- User-defined custom types
-		- Union types
-	* Automatic re-prompting of invalid arguments
-	* Optional arguments with default values
-	* Infinite arguments (arguments that accept as many values as provided)
-- Multiple responses to commands
-- Command editing (user edits their message that triggered the command, and the bot's response updates with it)
-- Command reloading, as well as loading/unloading
-- Command throttling/cooldowns
+Русская локализация командного фреймворка [Commando](https://github.com/discordjs/Commando), работающего поверх [discord.js](https://github.com/discordjs/discord.js).
 
-## Installation
-**Node 8.0.0 or newer is required.**  
-`npm install discord.js-commando`
+Полностью объектно-ориентированный, лёгкий в использовании.
+Использует функционал ES2017 (`async`/`await`).
 
-## Documentation
-[View the docs here.](https://discord.js.org/#/docs/commando)  
-See the [discord.js documentation](https://discord.js.org/#/docs) as well.
+## Функционал
+
+* Названия команд
+	* Альтернативные названия команд
+* Триггеры на основе регулярных выражений
+* Поддержка строковых аргументов (с поддержкой кавычек)
+* Сложная система аргументов
+	* Система типов аргументов с правилами, проверкой и парсингом значений
+		* Простые типы (`string`, `integer`, `float`, `boolean`)
+		* Объекты Дискорда (`user`, `member`, `role`, `channel`, `message`)
+		* Пользовательские типы
+		* Объединенные типы
+	* Необязательные аргументы
+	* Стандартные значения аргументов
+	* Поддержка бесконечных аргументов
+	* Повторный запрос неверных аргументов
+	* Автоматический запрос аргументов, которые не были указаны
+* Повторная обработка сообщений при редактировании
+* Задержка на повторное использование команд
+* Загрузка / выгрузка команд на лету
+
+## Установка
+
+**Необходима версия Node 8.0.0 или выше.**
+
+`npm install Assasans/Commando-ru#djs-v11`
+
+## Документация
+
+[Официальная документация Commando (англ.)](https://discord.js.org/#/docs/commando)
+[Официальная документация DiscordJS (англ.)](https://discord.js.org/#/docs)
