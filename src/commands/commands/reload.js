@@ -33,7 +33,7 @@ module.exports = class ReloadCommandCommand extends Command {
 		const isCmd = Boolean(cmdOrGrp.groupID);
 		cmdOrGrp.reload();
 
-		if(this.client.shard) {
+		if(this.client.shard.length > 0) {
 			try {
 				await this.client.shard.broadcastEval(`
 					if(this.shard.id !== ${this.client.shard.id}) {
@@ -44,29 +44,28 @@ module.exports = class ReloadCommandCommand extends Command {
 				this.client.emit('warn', `Error when broadcasting command reload to other shards`);
 				this.client.emit('error', err);
 				if(isCmd) {
-					await msg.reply(oneLine`
+					return msg.reply(oneLine`
 						Команда \`${cmdOrGrp.name}\` успешно перезагужена на текущем шарде,
 						но её перезагрузка не удалась на других шардах.
 					`);
 				} else {
-					await msg.reply(oneLine`
+					return msg.reply(oneLine`
 						Перезагружены все команды в группе \`${cmdOrGrp.name}\` на текущем шарде,
 						но их перезагрузка не удалась на других шардах.
 					`);
 				}
-				return null;
 			}
 		}
 
 		if(isCmd) {
-			await msg.reply(`
-				Команда \`${cmdOrGrp.name}\` успешно перезагружена${this.client.shard ? ' на всех шардах' : ''}.
+			return msg.reply(`
+				Команда \`${cmdOrGrp.name}\` успешно перезагружена${this.client.shard.length > 0 ? ' на всех шардах' : ''}.
 			`);
 		} else {
-			await msg.reply(
-				`Перезагружены все команды в группе \`${cmdOrGrp.name}\` ${this.client.shard ? ' на всех шардах' : ''}.`
-			);
+			return msg.reply(oneLine`
+				Перезагружены все команды в группе
+				\`${cmdOrGrp.name}\` ${this.client.shard.length > 0 ? ' на всех шардах' : ''}.
+			`);
 		}
-		return null;
 	}
 };

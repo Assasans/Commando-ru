@@ -47,7 +47,7 @@ module.exports = class LoadCommandCommand extends Command {
 		this.client.registry.registerCommand(args.command);
 		const command = this.client.registry.commands.last();
 
-		if(this.client.shard) {
+		if(this.client.shard.length > 0) {
 			try {
 				await this.client.shard.broadcastEval(`
 					if(this.shard.id !== ${this.client.shard.id}) {
@@ -59,15 +59,15 @@ module.exports = class LoadCommandCommand extends Command {
 			} catch(err) {
 				this.client.emit('warn', `Error when broadcasting command load to other shards`);
 				this.client.emit('error', err);
-				await msg.reply(oneLine`
+				return msg.reply(oneLine`
 					Команда \`${command.name}\` успешно загружена на текущем шарде,
 					но её загрузка не удалась на других шардах.
 				`);
-				return null;
 			}
 		}
 
-		await msg.reply(`Команда \`${command.name}\` успешно загружена${this.client.shard ? ' на всех шардах' : ''}.`);
-		return null;
+		return msg.reply(
+			`Команда \`${command.name}\` успешно загружена${this.client.shard.length > 0 ? ' на всех шардах' : ''}.`
+		);
 	}
 };

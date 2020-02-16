@@ -29,7 +29,7 @@ module.exports = class UnloadCommandCommand extends Command {
 	async run(msg, args) {
 		args.command.unload();
 
-		if(this.client.shard) {
+		if(this.client.shard.length > 0) {
 			try {
 				await this.client.shard.broadcastEval(`
 					if(this.shard.id !== ${this.client.shard.id}) this.registry.commands.get('${args.command.name}').unload();
@@ -37,15 +37,15 @@ module.exports = class UnloadCommandCommand extends Command {
 			} catch(err) {
 				this.client.emit('warn', `Error when broadcasting command unload to other shards`);
 				this.client.emit('error', err);
-				await msg.reply(oneLine`
+				return msg.reply(oneLine`
 					Команда \`${args.command.name}\` успешно выгружена на текущем шарде,
 					но её выгрузка не удалась на других шардах.
 				`);
-				return null;
 			}
 		}
 
-		await msg.reply(`Команда \`${args.command.name}\` успешно выгружена${this.client.shard ? ' на всех шардах' : ''}.`);
-		return null;
+		return msg.reply(
+			`Команда \`${args.command.name}\` успешно выгружена${this.client.shard.length > 0 ? ' на всех шардах' : ''}.`
+		);
 	}
 };
