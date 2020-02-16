@@ -242,9 +242,11 @@ class CommandMessage {
 
 				const invite = this.client.options.invite;
 				return this.reply(stripIndents`
-					При выполнении команды **\`${this.command.name}\`** произошла ошибка: **\`${err.name}: ${err.message}\`**
+					При выполнении команды **\`${this.command.name}\`** произошла ошибка: ${oneLine`
+						**\`${err.name}: ${err.message.length > 100 ? `${err.message.slice(0, 100)}...` : err.message}\`**
+					`}
 					Трассировка стека: \`\`\`javascript
-					${err.stack}\`\`\`${oneLine`
+					${err.stack.length > 1700 ? `${err.stack.slice(0, 1700)}...` : err.stack}\`\`\`${oneLine`
 						Пожалуйста, свяжитесь с
 						${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
 					`}
