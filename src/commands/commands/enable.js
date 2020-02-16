@@ -31,7 +31,7 @@ module.exports = class EnableCommandCommand extends Command {
 		const group = args.cmdOrGrp.group;
 		if(args.cmdOrGrp.isEnabledIn(msg.guild, true)) {
 			return msg.reply(
-				`${args.cmdOrGrp.group ? 'Команда' : 'Группа'} \`${args.cmdOrGrp.name}\` уже включена${
+				`${args.cmdOrGrp.group ? 'Команда' : 'Группа'} \`${args.cmdOrGrp.name}\` включена${
 					group && !group.isEnabledIn(msg.guild) ?
 					`, но группа \`${group.name}\` отключена, поэтому команда не может быть использована` : ''
 				}.`
@@ -39,7 +39,7 @@ module.exports = class EnableCommandCommand extends Command {
 		}
 		args.cmdOrGrp.setEnabledIn(msg.guild, true);
 		return msg.reply(
-			`${group ? 'Команда' : 'Группа'}\`${args.cmdOrGrp.name}\` успешно включена${
+			`${group ? 'Команда' : 'Группа'} \`${args.cmdOrGrp.name}\` успешно включена${
 				group && !group.isEnabledIn(msg.guild) ?
 				`, но группа \`${group.name}\` отключена, поэтому команда не может быть использована` : ''
 			}.`
