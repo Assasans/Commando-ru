@@ -8,22 +8,18 @@ module.exports = class ListGroupsCommand extends Command {
 			aliases: ['list-groups', 'show-groups'],
 			group: 'commands',
 			memberName: 'groups',
-			description: 'Lists all command groups.',
-			details: 'Only administrators may use this command.',
-			guarded: true
+			description: 'Выводит список всех групп команд.',
+			details: 'Только владельцы бота могу использовать эту команду.',
+			guarded: true,
+			ownerOnly: true
 		});
-	}
-
-	hasPermission(msg) {
-		if(!msg.guild) return this.client.isOwner(msg.author);
-		return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
 	}
 
 	run(msg) {
 		return msg.reply(stripIndents`
-			__**Groups**__
+		__**Группы: **__
 			${this.client.registry.groups.map(grp =>
-				`**${grp.name}:** ${grp.isEnabledIn(msg.guild) ? 'Enabled' : 'Disabled'}`
+				`**${grp.name}:** ${grp.isEnabledIn(msg.guild) ? 'Включена' : 'Отключена'}`
 			).join('\n')}
 		`);
 	}

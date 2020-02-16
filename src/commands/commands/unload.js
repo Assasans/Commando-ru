@@ -8,19 +8,18 @@ module.exports = class UnloadCommandCommand extends Command {
 			aliases: ['unload-command'],
 			group: 'commands',
 			memberName: 'unload',
-			description: 'Unloads a command.',
+			description: 'Выгружает команду.',
 			details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command.
-				Only the bot owner(s) may use this command.
+				Аргументом должно быть название (частичное или полное) или ID команды.
+				Только владельцы бота могу использовать эту команду.
 			`,
 			examples: ['unload some-command'],
-			ownerOnly: true,
 			guarded: true,
-
+			ownerOnly: true,
 			args: [
 				{
 					key: 'command',
-					prompt: 'Which command would you like to unload?',
+					prompt: 'Какую команду вы хотите выгрузить?',
 					type: 'command'
 				}
 			]
@@ -38,12 +37,15 @@ module.exports = class UnloadCommandCommand extends Command {
 			} catch(err) {
 				this.client.emit('warn', `Error when broadcasting command unload to other shards`);
 				this.client.emit('error', err);
-				await msg.reply(`Unloaded \`${args.command.name}\` command, but failed to unload on other shards.`);
+				await msg.reply(oneLine`
+					Команда \`${args.command.name}\` успешно выгружена на текущем шарде,
+					но её выгрузка не удалась на других шардах.
+				`);
 				return null;
 			}
 		}
 
-		await msg.reply(`Unloaded \`${args.command.name}\` command${this.client.shard ? ' on all shards' : ''}.`);
+		await msg.reply(`Команда \`${args.command.name}\` успешно выгружена${this.client.shard ? ' на всех шардах' : ''}.`);
 		return null;
 	}
 };

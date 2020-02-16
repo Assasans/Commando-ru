@@ -8,42 +8,37 @@ module.exports = class DisableCommandCommand extends Command {
 			aliases: ['disable-command', 'cmd-off', 'command-off'],
 			group: 'commands',
 			memberName: 'disable',
-			description: 'Disables a command or command group.',
+			description: 'Отключает команду или группу команд.',
 			details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command or command group.
-				Only administrators may use this command.
+				Аргументом должно быть название (частичное или полное) или ID команды или группы команд.
+				Только владельцы бота могу использовать эту команду.
 			`,
 			examples: ['disable util', 'disable Utility', 'disable prefix'],
 			guarded: true,
-
+			ownerOnly: true,
 			args: [
 				{
 					key: 'cmdOrGrp',
 					label: 'command/group',
-					prompt: 'Which command or group would you like to disable?',
+					prompt: 'Какую команду или группу команд вы хотите отключить?',
 					type: 'group|command'
 				}
 			]
 		});
 	}
 
-	hasPermission(msg) {
-		if(!msg.guild) return this.client.isOwner(msg.author);
-		return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
-	}
-
 	run(msg, args) {
 		if(!args.cmdOrGrp.isEnabledIn(msg.guild, true)) {
 			return msg.reply(
-				`The \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'} is already disabled.`
+				`${args.cmdOrGrp.group ? 'Команда' : 'Группа'} \`${args.cmdOrGrp.name}\` уже отключена.`
 			);
 		}
 		if(args.cmdOrGrp.guarded) {
 			return msg.reply(
-				`You cannot disable the \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'}.`
+				`Вы не можете отключить ${args.cmdOrGrp.group ? 'команду' : 'группу'} \`${args.cmdOrGrp.name}\`.`
 			);
 		}
 		args.cmdOrGrp.setEnabledIn(msg.guild, false);
-		return msg.reply(`Disabled the \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'}.`);
+		return msg.reply(`${args.cmdOrGrp.group ? 'Команда' : 'Группа'} \`${args.cmdOrGrp.name}\` успешно отключена.`);
 	}
 };

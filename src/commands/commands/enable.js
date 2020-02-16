@@ -8,43 +8,40 @@ module.exports = class EnableCommandCommand extends Command {
 			aliases: ['enable-command', 'cmd-on', 'command-on'],
 			group: 'commands',
 			memberName: 'enable',
-			description: 'Enables a command or command group.',
+			description: 'Включает команду или группу команд.',
 			details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command or command group.
-				Only administrators may use this command.
+				Аргументом должно быть название (частичное или полное) или ID команды или группы команд.
+				Только владельцы бота могу использовать эту команду.
 			`,
 			examples: ['enable util', 'enable Utility', 'enable prefix'],
 			guarded: true,
-
+			ownerOnly: true,
 			args: [
 				{
 					key: 'cmdOrGrp',
 					label: 'command/group',
-					prompt: 'Which command or group would you like to enable?',
+					prompt: 'Какую команду или группу команд вы хотите включить',
 					type: 'group|command'
 				}
 			]
 		});
 	}
 
-	hasPermission(msg) {
-		if(!msg.guild) return this.client.isOwner(msg.author);
-		return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
-	}
-
 	run(msg, args) {
 		const group = args.cmdOrGrp.group;
 		if(args.cmdOrGrp.isEnabledIn(msg.guild, true)) {
 			return msg.reply(
-				`The \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'} is already enabled${
-					group && !group.enabled ? `, but the \`${group.name}\` group is disabled, so it still can't be used` : ''
+				`${args.cmdOrGrp.group ? 'Команда' : 'Группа'} \`${args.cmdOrGrp.name}\` уже включена${
+					group && !group.isEnabledIn(msg.guild) ?
+					`, но группа \`${group.name}\` отключена, поэтому команда не может быть использована` : ''
 				}.`
 			);
 		}
 		args.cmdOrGrp.setEnabledIn(msg.guild, true);
 		return msg.reply(
-			`Enabled the \`${args.cmdOrGrp.name}\` ${group ? 'command' : 'group'}${
-				group && !group.enabled ? `, but the \`${group.name}\` group is disabled, so it still can't be used` : ''
+			`${group ? 'Команда' : 'Группа'}\`${args.cmdOrGrp.name}\` успешно включена${
+				group && !group.isEnabledIn(msg.guild) ?
+				`, но группа \`${group.name}\` отключена, поэтому команда не может быть использована` : ''
 			}.`
 		);
 	}

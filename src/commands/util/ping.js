@@ -7,7 +7,7 @@ module.exports = class PingCommand extends Command {
 			name: 'ping',
 			group: 'util',
 			memberName: 'ping',
-			description: 'Checks the bot\'s ping to the Discord server.',
+			description: 'Проверяет задержку соединения бота с серверами Дискорда',
 			throttling: {
 				usages: 5,
 				duration: 10
@@ -17,17 +17,17 @@ module.exports = class PingCommand extends Command {
 
 	async run(msg) {
 		if(!msg.editable) {
-			const pingMsg = await msg.reply('Pinging...');
+			const pingMsg = await msg.reply('Проверяем задержку...');
 			return pingMsg.edit(oneLine`
 				${msg.channel.type !== 'dm' ? `${msg.author},` : ''}
-				Pong! The message round-trip took ${pingMsg.createdTimestamp - msg.createdTimestamp}ms.
-				${this.client.ping ? `The heartbeat ping is ${Math.round(this.client.ping)}ms.` : ''}
+				Ответ от серверов получен!\nЗадержка на стороне бота: ${pingMsg.createdTimestamp - msg.createdTimestamp} мс.
+				${this.client.ping ? `\nЗадержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
 			`);
 		} else {
-			await msg.edit('Pinging...');
+			await msg.edit('Проверяем задержку...');
 			return msg.edit(oneLine`
-				Pong! The message round-trip took ${msg.editedTimestamp - msg.createdTimestamp}ms.
-				${this.client.ping ? `The heartbeat ping is ${Math.round(this.client.ping)}ms.` : ''}
+				Ответ от серверов получен!\nЗадержка на стороне бота: ${msg.editedTimestamp - msg.createdTimestamp} мс.
+				${this.client.ping ? `\nЗадержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
 			`);
 		}
 	}

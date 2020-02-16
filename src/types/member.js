@@ -36,7 +36,7 @@ class MemberArgumentType extends ArgumentType {
 			`${disambiguation(
 				members.map(mem => `${escapeMarkdown(mem.user.username)}#${mem.user.discriminator}`), 'members', null
 			)}\n` :
-			'Multiple members found. Please be more specific.';
+			'Найдено несколько участников. Пожалуйста, укажите более точное имя.';
 	}
 
 	parse(value, msg) {

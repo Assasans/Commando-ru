@@ -122,7 +122,7 @@ class CommandDispatcher {
 			if(!inhibited) {
 				if(cmdMsg.command) {
 					if(!cmdMsg.command.isEnabledIn(message.guild)) {
-						responses = await cmdMsg.reply(`The \`${cmdMsg.command.name}\` command is disabled.`);
+						responses = await cmdMsg.reply(`Команда \`${cmdMsg.command.name}\` отключена.`);
 					} else if(!oldMessage || typeof oldCmdMsg !== 'undefined') {
 						responses = await cmdMsg.run();
 						if(typeof responses === 'undefined') responses = null; // eslint-disable-line max-depth
@@ -136,11 +136,11 @@ class CommandDispatcher {
 					this.client.emit('unknownCommand', cmdMsg);
 					if(this.client.options.unknownCommandResponse) {
 						responses = await cmdMsg.reply(
-							`Unknown command. Use ${cmdMsg.anyUsage(
+							`Неизвестная команда. Напишите ${cmdMsg.anyUsage(
 								'help',
 								message.guild ? undefined : null,
 								message.guild ? undefined : null
-							)} to view the list of all commands.`
+							)}, чтобы посмотреть список доступных команд.`
 						);
 					}
 				}

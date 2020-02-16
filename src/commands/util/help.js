@@ -9,10 +9,10 @@ module.exports = class HelpCommand extends Command {
 			group: 'util',
 			memberName: 'help',
 			aliases: ['commands'],
-			description: 'Displays a list of available commands, or detailed information for a specified command.',
+			description: 'Показвыает список доступных команд или подробную информацию про команду.',
 			details: oneLine`
-				The command may be part of a command name or a whole command name.
-				If it isn't specified, all available commands will be listed.
+				Аргумент может быть названием (частичным или полным) команды.
+				Если команда не указана - будет выведен список всех доступных вам команд.
 			`,
 			examples: ['help', 'help prefix'],
 			guarded: true,
@@ -20,7 +20,7 @@ module.exports = class HelpCommand extends Command {
 			args: [
 				{
 					key: 'command',
-					prompt: 'Which command would you like to view the help for?',
+					prompt: 'Для какой команды вы хотите посмотреть подробную информацию?',
 					type: 'string',
 					default: ''
 				}
@@ -36,38 +36,45 @@ module.exports = class HelpCommand extends Command {
 			if(commands.length === 1) {
 				let help = stripIndents`
 					${oneLine`
-						__Command **${commands[0].name}**:__ ${commands[0].description}
-						${commands[0].guildOnly ? ' (Usable only in servers)' : ''}
+						__Команда **\`${commands[0].name}\`**:__ ${commands[0].description}
+						${commands[0].guildOnly ? ' (Только на серверах)' : ''}
 						${commands[0].nsfw ? ' (NSFW)' : ''}
 					`}
 
-					**Format:** ${msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`)}
+					**Формат:** ${msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`)}
 				`;
-				if(commands[0].aliases.length > 0) help += `\n**Aliases:** ${commands[0].aliases.join(', ')}`;
+				if(commands[0].aliases.length > 0) help += `\n**Альтернативные названия:** ${commands[0].aliases.join(', ')}`;
 				help += `\n${oneLine`
-					**Group:** ${commands[0].group.name}
+					**Группа:** ${commands[0].group.name}
 					(\`${commands[0].groupID}:${commands[0].memberName}\`)
 				`}`;
-				if(commands[0].details) help += `\n**Details:** ${commands[0].details}`;
-				if(commands[0].examples) help += `\n**Examples:**\n${commands[0].examples.join('\n')}`;
+				if(commands[0].details) help += `\n**Подробная информация:** ${commands[0].details}`;
+				if(commands[0].examples) help += `\n**Примеры выполнения:**\n${commands[0].examples.join('\n')}`;
 
 				const messages = [];
 				try {
 					messages.push(await msg.direct(help));
-					if(msg.channel.type !== 'dm') messages.push(await msg.reply('Sent you a DM with information.'));
+					if(msg.channel.type !== 'dm') {
+						messages.push(await msg.reply(oneLine`
+							Успешно отправлено личное сообщение с подробной информацией про команду.
+						`));
+					}
 				} catch(err) {
-					messages.push(await msg.reply('Unable to send you the help DM. You probably have DMs disabled.'));
+					messages.push(await msg.reply(oneLine`
+						Не удалось отпраить личное сообщение с подробной информацией про команду.
+						Возможно у вас отключены ЛС от участников сервера.
+					`));
 				}
 				return messages;
 			} else if(commands.length > 15) {
-				return msg.reply('Multiple commands found. Please be more specific.');
+				return msg.reply('Найдено несколько команд. Пожалуйста, укажите более точное название.');
 			} else if(commands.length > 1) {
 				return msg.reply(disambiguation(commands, 'commands'));
 			} else {
 				return msg.reply(
-					`Unable to identify command. Use ${msg.usage(
+					`Не удалось распознать команду. Напишите ${msg.usage(
 						null, msg.channel.type === 'dm' ? null : undefined, msg.channel.type === 'dm' ? null : undefined
-					)} to view the list of all commands.`
+					)}, чтобы посмотреть список доступных команд.`
 				);
 			}
 		} else {
@@ -75,16 +82,25 @@ module.exports = class HelpCommand extends Command {
 			try {
 				messages.push(await msg.direct(stripIndents`
 					${oneLine`
-						To run a command in ${msg.guild ? msg.guild.name : 'any server'},
-						use ${Command.usage('command', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
-						For example, ${Command.usage('prefix', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
+						Для того, чтобы выполнить команду на ${msg.guild ? msg.guild.name : 'любом сервере'},
+						напишите ${Command.usage('command', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
+						Например: ${Command.usage('prefix', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
 					`}
-					To run a command in this DM, simply use ${Command.usage('command', null, null)} with no prefix.
+					${oneLine`
+						Для того, чтобы выполнить команду в ЛС - просто напишите
+						${Command.usage('command', null, null)} (без префикса).
+					`}
 
-					Use ${this.usage('<command>', null, null)} to view detailed information about a specific command.
-					Use ${this.usage('all', null, null)} to view a list of *all* commands, not just available ones.
+					Напишите ${this.usage('<команда>', null, null)} для того, чтобы посмотреть подробую информацию про команду.
+					${oneLine`
+						Напишите ${this.usage('all', null, null)} для того, чтобы посмотреть список
+						__всех__ команд, а не только доступных вам.
+					`}
 
-					__**${showAll ? 'All commands' : `Available commands in ${msg.guild || 'this DM'}`}**__
+					${oneLine`
+						**${showAll ? 'Список всех команд' : `Список команд доступных
+						${msg.guild ? `на сервере __${msg.guild}__` : 'в этом ЛС'}`}**
+					`}
 
 					${(showAll ? groups : groups.filter(grp => grp.commands.some(cmd => cmd.isUsable(msg))))
 						.map(grp => stripIndents`
@@ -95,9 +111,16 @@ module.exports = class HelpCommand extends Command {
 						`).join('\n\n')
 					}
 				`, { split: true }));
-				if(msg.channel.type !== 'dm') messages.push(await msg.reply('Sent you a DM with information.'));
+				if(msg.channel.type !== 'dm') {
+					messages.push(await msg.reply(oneLine`
+						Успешно отправлено личное сообщение со списком доступных команд.
+					`));
+				}
 			} catch(err) {
-				messages.push(await msg.reply('Unable to send you the help DM. You probably have DMs disabled.'));
+				messages.push(await msg.reply(oneLine`
+					Не удалось отпраить личное сообщение с списком команд.
+					Возможно у вас отключены ЛС от участников сервера.
+				`));
 			}
 			return messages;
 		}
