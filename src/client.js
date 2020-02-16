@@ -142,6 +142,7 @@ class CommandoClient extends discord.Client {
 	 * @return {Promise<void>}
 	 */
 	async setProvider(provider) {
+		// eslint-disable-next-line require-atomic-updates
 		provider = await provider;
 		this.provider = provider;
 
