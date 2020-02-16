@@ -11,7 +11,7 @@ class RoleArgumentType extends ArgumentType {
 		const matches = value.match(/^(?:<@&)?([0-9]+)>?$/);
 		if(matches) return msg.guild.roles.has(matches[1]);
 		const search = value.toLowerCase();
-		let roles = msg.guild.roles.filter(nameFilterInexact(search));
+		let roles = msg.guild.roles.filterArray(nameFilterInexact(search));
 		if(roles.length === 0) return false;
 		if(roles.length === 1) {
 			if(arg.oneOf && !arg.oneOf.includes(roles[0].id)) return false;
@@ -32,7 +32,7 @@ class RoleArgumentType extends ArgumentType {
 		const matches = value.match(/^(?:<@&)?([0-9]+)>?$/);
 		if(matches) return msg.guild.roles.get(matches[1]) || null;
 		const search = value.toLowerCase();
-		const roles = msg.guild.roles.filter(nameFilterInexact(search));
+		const roles = msg.guild.roles.filterArray(nameFilterInexact(search));
 		if(roles.length === 0) return null;
 		if(roles.length === 1) return roles[0];
 		const exactRoles = roles.filter(nameFilterExact(search));
