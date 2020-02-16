@@ -1,4 +1,4 @@
-const { oneLine } = require('common-tags');
+const { stripIndents } = require('common-tags');
 const Command = require('../base');
 
 module.exports = class PingCommand extends Command {
@@ -18,14 +18,14 @@ module.exports = class PingCommand extends Command {
 	async run(msg) {
 		if(!msg.editable) {
 			const pingMsg = await msg.reply('Проверяем задержку...');
-			return pingMsg.edit(oneLine`
+			return pingMsg.edit(stripIndents`
 				${msg.channel.type !== 'dm' ? `${msg.author},` : ''}
 				Ответ от серверов получен!\nЗадержка на стороне бота: ${pingMsg.createdTimestamp - msg.createdTimestamp} мс.
 				${this.client.ping ? `\nЗадержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
 			`);
 		} else {
 			await msg.edit('Проверяем задержку...');
-			return msg.edit(oneLine`
+			return msg.edit(stripIndents`
 				Ответ от серверов получен!\nЗадержка на стороне бота: ${msg.editedTimestamp - msg.createdTimestamp} мс.
 				${this.client.ping ? `\nЗадержка на стороне серверов Дискорда: ${Math.round(this.client.ping)} мс.` : ''}
 			`);
