@@ -130,12 +130,12 @@ class CommandMessage {
 			 * (built-in reasons are `guildOnly`, `permission`, and `throttling`)
 			 */
 			this.client.emit('commandBlocked', this, 'guildOnly');
-			return this.reply(`Команда \`${this.name}\` может быть выполнена только на серверах.`);
+			return this.reply(`Команда \`${this.command.name}\` может быть выполнена только на серверах.`);
 		}
 
 		if(this.command.nsfw && !this.message.channel.nsfw) {
 			this.client.emit('commandBlocked', this, 'nsfw');
-			return this.reply(`Команда \`${this.name}\` может быть выполнена только в NSFW каналах.`);
+			return this.reply(`Команда \`${this.command.name}\` может быть выполнена только в NSFW каналах.`);
 		}
 
 		// Ensure the user has permission to use the command
@@ -143,7 +143,7 @@ class CommandMessage {
 		if(!hasPermission || typeof hasPermission === 'string') {
 			this.client.emit('commandBlocked', this, 'permission');
 			if(typeof hasPermission === 'string') return this.reply(hasPermission);
-			else return this.reply(`У вас нет прав для выполнения команды \`${this.name}\`.`);
+			else return this.reply(`У вас нет прав для выполнения команды \`${this.command.name}\`.`);
 		}
 
 		// Ensure the client user has the required permissions
@@ -153,11 +153,11 @@ class CommandMessage {
 				this.client.emit('commandBlocked', this, 'clientPermissions');
 				if(missing.length === 1) {
 					return this.reply(
-						`Боту необходимо иметь право "${missing[0]}" для выполнения команды \`${this.name}\`.`
+						`Боту необходимо иметь право "${missing[0]}" для выполнения команды \`${this.command.name}\`.`
 					);
 				}
 				return this.reply(oneLine`
-				Для выполнения команды \`${this.name}\` боту необходимо иметь следующие права:
+				Для выполнения команды \`${this.command.name}\` боту необходимо иметь следующие права:
 					${missing.map(perm => permissions[perm]).join(', ')}
 				`);
 			}
@@ -169,7 +169,7 @@ class CommandMessage {
 			const remaining = (throttle.start + (this.command.throttling.duration * 1000) - Date.now()) / 1000;
 			this.client.emit('commandBlocked', this, 'throttling');
 			return this.reply(oneLine`
-				Для повторного выполнения команды \`${this.name}\`
+				Для повторного выполнения команды \`${this.command.name}\`
 				вам необходимо подождать ${remaining.toFixed(1)} секунд.
 			`);
 		}
