@@ -1,6 +1,6 @@
 {
 	"name": "@assasans/discord.js-commando",
-	"version": "0.10.3",
+	"version": "0.10.4",
 	"description": "The official command framework for Discord.js",
 	"license": "Apache-2.0",
 	"author": "Assasans <swimmin2@gmail.com> (http://assasans.ml/)",
