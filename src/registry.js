@@ -309,6 +309,7 @@ class CommandRegistry {
 			require('./types/user'),
 			require('./types/member'),
 			require('./types/role'),
+			require('./types/guild'),
 			require('./types/channel'),
 			require('./types/message'),
 			require('./types/command'),
