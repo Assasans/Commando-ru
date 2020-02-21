@@ -294,6 +294,7 @@ class CommandRegistry {
 	 * - user
 	 * - member
 	 * - role
+	 * - guild
 	 * - channel
 	 * - message
 	 * - command
