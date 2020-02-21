@@ -251,8 +251,8 @@ class CommandRegistry {
 	 */
 	registerDefaultGroups() {
 		return this.registerGroups([
-			['commands', 'Commands', true],
-			['util', 'Utility']
+			['commands', 'Операции с командами', true],
+			['util', 'Утилиты']
 		]);
 	}
 
