@@ -121,14 +121,19 @@ class CommandMessage {
 		}
 
 		// Make sure the command is usable
-		if(this.command.guildOnly && !this.message.guild) {
+		if(this.command.dmOnly && this.message.guild) {
 			/**
 			 * Emitted when a command is prevented from running
 			 * @event CommandoClient#commandBlocked
 			 * @param {CommandMessage} message - Command message that the command is running from
 			 * @param {string} reason - Reason that the command was blocked
-			 * (built-in reasons are `guildOnly`, `permission`, and `throttling`)
+			 * (built-in reasons are `dmOnly`, `guildOnly`, `permission`, and `throttling`)
 			 */
+			this.client.emit('commandBlocked', this, 'dmOnly');
+			return this.reply(`Команда \`${this.command.name}\` может быть выполнена только в ЛС.`);
+		}
+
+		if(this.command.guildOnly && !this.message.guild) {
 			this.client.emit('commandBlocked', this, 'guildOnly');
 			return this.reply(`Команда \`${this.command.name}\` может быть выполнена только на серверах.`);
 		}

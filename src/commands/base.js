@@ -23,6 +23,7 @@ class Command {
 	 * and `args` is specified
 	 * @property {string} [details] - A detailed description of the command and its functionality
 	 * @property {string[]} [examples] - Usage examples of the command
+	 * @property {boolean} [dmOnly=false] - Whether or not the command should only function in a DM channel
 	 * @property {boolean} [guildOnly=false] - Whether or not the command should only function in a guild channel
 	 * @property {boolean} [ownerOnly=false] - Whether or not the command is usable only by an owner
 	 * @property {PermissionResolvable[]} [clientPermissions] - Permissions required by the client to use the command.
@@ -122,6 +123,12 @@ class Command {
 		 * @type {?string[]}
 		 */
 		this.examples = info.examples || null;
+
+		/**
+		 * Whether the command can only be run in a DM channel
+		 * @type {boolean}
+		 */
+		this.dmOnly = Boolean(info.dmOnly);
 
 		/**
 		 * Whether the command can only be run in a guild channel
@@ -332,6 +339,7 @@ class Command {
 	 */
 	isUsable(message = null) {
 		if(!message) return this._globalEnabled;
+		if(this.dmOnly && message && message.guild) return false;
 		if(this.guildOnly && message && !message.guild) return false;
 		let hasPermission = this.hasPermission(message);
 		if(typeof hasPermission === 'string') hasPermission = false;

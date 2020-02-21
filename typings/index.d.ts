@@ -74,6 +74,7 @@ declare module 'discord.js-commando' {
 		public group: CommandGroup;
 		public groupID: string;
 		public guarded: boolean;
+		public dmOnly: boolean;
 		public guildOnly: boolean;
 		public memberName: string;
 		public name: string;
@@ -420,6 +421,7 @@ declare module 'discord.js-commando' {
 		format?: string;
 		details?: string;
 		examples?: string[];
+		dmOnly?: boolean;
 		guildOnly?: boolean;
 		defaultHandling?: boolean;
 		throttling?: ThrottlingOptions;
