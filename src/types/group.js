@@ -12,7 +12,7 @@ class GroupArgumentType extends ArgumentType {
 		if(groups.length === 1) return true;
 		if(groups.length === 0) return false;
 		return groups.length <= 15 ?
-			`${disambiguation(groups.map(grp => escapeMarkdown(grp.name)), 'groups', null)}\n` :
+			`${disambiguation(groups.map(grp => escapeMarkdown(grp.name)), 'групп', null)}\n` :
 			'Найдено несколько групп. Пожалуйста, укажите более точное название.';
 	}
 

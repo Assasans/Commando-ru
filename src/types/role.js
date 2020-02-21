@@ -24,7 +24,7 @@ class RoleArgumentType extends ArgumentType {
 		}
 		if(exactRoles.length > 0) roles = exactRoles;
 		return roles.length <= 15 ?
-			`${disambiguation(roles.map(role => `${escapeMarkdown(role.name)}`), 'roles', null)}\n` :
+			`${disambiguation(roles.map(role => `${escapeMarkdown(role.name)}`), 'ролей', null)}\n` :
 			'Найдено несколько ролей. Пожалуйста, укажите более точное название.';
 	}
 

@@ -34,7 +34,7 @@ class MemberArgumentType extends ArgumentType {
 		if(exactMembers.length > 0) members = exactMembers;
 		return members.length <= 15 ?
 			`${disambiguation(
-				members.map(mem => `${escapeMarkdown(mem.user.username)}#${mem.user.discriminator}`), 'members', null
+				members.map(mem => `${escapeMarkdown(mem.user.username)}#${mem.user.discriminator}`), 'участников', null
 			)}\n` :
 			'Найдено несколько участников. Пожалуйста, укажите более точное имя.';
 	}
