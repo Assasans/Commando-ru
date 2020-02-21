@@ -35,7 +35,11 @@
 
 NPM: `npm install @assasans/discord.js-commando`
 
+NPM (Как замена оригинальной библиотеки): `npm install discord.js-commando@npm:@assasans/discord.js-commando`
+
 GitHub: `npm install Assasans/Commando-ru#djs-v11`
+
+GitHub (Как замена оригинальной библиотеки): `npm install discord.js-commando@Assasans/Commando-ru#djs-v11`
 
 ## Документация
 
