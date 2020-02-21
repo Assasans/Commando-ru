@@ -158,7 +158,7 @@ class CommandMessage {
 				this.client.emit('commandBlocked', this, 'clientPermissions');
 				if(missing.length === 1) {
 					return this.reply(
-						`Боту необходимо иметь право "${missing[0]}" для выполнения команды \`${this.command.name}\`.`
+						`Боту необходимо иметь право "${permissions[missing[0]]}" для выполнения команды \`${this.command.name}\`.`
 					);
 				}
 				return this.reply(oneLine`
