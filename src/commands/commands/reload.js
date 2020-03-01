@@ -58,7 +58,7 @@ module.exports = class ReloadCommandCommand extends Command {
 		}
 
 		if(isCmd) {
-			return msg.reply(`
+			return msg.reply(oneLine`
 				Команда \`${cmdOrGrp.name}\` успешно перезагружена${this.client.shard.length > 0 ? ' на всех шардах' : ''}.
 			`);
 		} else {
