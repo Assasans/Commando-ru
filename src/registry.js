@@ -263,15 +263,24 @@ class CommandRegistry {
 	 * @param {boolean} [options.prefix=true] - Whether or not to register the built-in prefix command
 	 * @param {boolean} [options.eval_=true] - Whether or not to register the built-in eval command
 	 * @param {boolean} [options.ping=true] - Whether or not to register the built-in ping command
+	 * @param {boolean} [options.version=true] - Whether or not to register the built-in version command
 	 * @param {boolean} [options.commandState=true] - Whether or not to register the built-in command state commands
 	 * (enable, disable, reload, list groups)
 	 * @return {CommandRegistry}
 	 */
-	registerDefaultCommands({ help = true, prefix = true, ping = true, eval_ = true, commandState = true } = {}) {
+	registerDefaultCommands({
+		help = true,
+		prefix = true,
+		ping = true,
+		eval_ = true,
+		version = true,
+		commandState = true
+	} = {}) {
 		if(help) this.registerCommand(require('./commands/util/help'));
 		if(prefix) this.registerCommand(require('./commands/util/prefix'));
 		if(ping) this.registerCommand(require('./commands/util/ping'));
 		if(eval_) this.registerCommand(require('./commands/util/eval'));
+		if(version) this.registerCommand(require('./commands/util/version'));
 		if(commandState) {
 			this.registerCommands([
 				require('./commands/commands/groups'),
