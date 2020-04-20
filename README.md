@@ -31,7 +31,7 @@
 
 ## Установка
 
-**Необходима версия Node 8.0.0 или выше.**
+**Необходима версия Node 12.7.3 или выше.**
 
 NPM: `npm install @assasans/discord.js-commando`
 
