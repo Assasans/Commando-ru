@@ -16,7 +16,7 @@ class Command {
 	 * @typedef {Object} CommandInfo
 	 * @property {string} name - The name of the command (must be lowercase)
 	 * @property {string[]} [aliases] - Alternative names for the command (all must be lowercase)
-	 * @property {boolean} [autoAliases=true] - Whether automatic aliases should be added
+	 * @property {boolean} [autoAliases=false] - Whether automatic aliases should be added
 	 * @property {string} group - The ID of the group the command belongs to (must be lowercase)
 	 * @property {string} memberName - The member name of the command in the group (must be lowercase)
 	 * @property {string} description - A short description of the command
@@ -24,6 +24,7 @@ class Command {
 	 * and `args` is specified
 	 * @property {string} [details] - A detailed description of the command and its functionality
 	 * @property {string[]} [examples] - Usage examples of the command
+	 * @property {boolean} [dmOnly=false] - Whether or not the command should only function in a DM channel
 	 * @property {boolean} [guildOnly=false] - Whether or not the command should only function in a guild channel
 	 * @property {boolean} [ownerOnly=false] - Whether or not the command is usable only by an owner
 	 * @property {PermissionResolvable[]} [clientPermissions] - Permissions required by the client to use the command.
@@ -78,7 +79,7 @@ class Command {
 		 * @type {string[]}
 		 */
 		this.aliases = info.aliases || [];
-		if(typeof info.autoAliases === 'undefined' || info.autoAliases) {
+		if(info.autoAliases) {
 			if(this.name.includes('-')) this.aliases.push(this.name.replace(/-/g, ''));
 			for(const alias of this.aliases) {
 				if(alias.includes('-')) this.aliases.push(alias.replace(/-/g, ''));
@@ -126,6 +127,12 @@ class Command {
 		 * @type {?string[]}
 		 */
 		this.examples = info.examples || null;
+
+		/**
+		 * Whether the command can only be run in a DM channel
+		 * @type {boolean}
+		 */
+		this.dmOnly = Boolean(info.dmOnly);
 
 		/**
 		 * Whether the command can only be run in a guild channel
@@ -292,8 +299,9 @@ class Command {
 	 * Called when the command is prevented from running
 	 * @param {CommandMessage} message - Command message that the command is running from
 	 * @param {string} reason - Reason that the command was blocked
-	 * (built-in reasons are `guildOnly`, `nsfw`, `permission`, `throttling`, and `clientPermissions`)
+	 * (built-in reasons are `dmOnly`, `guildOnly`, `nsfw`, `permission`, `throttling`, and `clientPermissions`)
 	 * @param {Object} [data] - Additional data associated with the block. Built-in reason data properties:
+	 * - dmOnly: none
 	 * - guildOnly: none
 	 * - nsfw: none
 	 * - permission: `response` ({@link string}) to send
@@ -303,30 +311,79 @@ class Command {
 	 */
 	onBlock(message, reason, data) {
 		switch(reason) {
+			case 'dmOnly':
+				return message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: `Команда \`${this.name}\` может быть выполнена только в ЛС.`
+					}
+				});
+
 			case 'guildOnly':
-				return message.reply(`Команда \`${this.name}\` может быть выполнена только на сервера.`);
+				return message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: `Команда \`${this.name}\` может быть выполнена только на серверах.`
+					}
+				});
+
 			case 'nsfw':
-				return message.reply(`КомандаThe \`${this.name}\` может быть выполнена только в NSFW каналах.`);
+				return message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: `Команда \`${this.name}\` может быть выполнена только в NSFW каналах.`
+					}
+				});
+
 			case 'permission': {
 				if(data.response) return message.reply(data.response);
-				return message.reply(`У вас нат прав для выполнения команды \`${this.name}\`.`);
+				return message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: `У вас нет прав для выполнения команды \`${this.name}\`.`
+					}
+				});
 			}
+
 			case 'clientPermissions': {
 				if(data.missing.length === 1) {
-					return message.reply(
-						`Боту необходимо иметь право "${permissions[data.missing[0]]}" для выполнения команды \`${this.name}\`.`
-					);
+					return message.channel.send(`${message.author.toString()}`, {
+						embed: {
+							title: 'Ошибка',
+							color: 0xd32f2f,
+							description: oneLine`
+								Боту необходимо иметь право "${permissions[data.missing[0]]}"
+								для выполнения команды \`${this.name}\`.
+							`
+						}
+					});
 				}
-				return message.reply(oneLine`
-					Для выполнения команды \`${this.name}\` боту необходимо иметь следующие права:
-					${data.missing.map(perm => permissions[perm]).join(', ')}
-				`);
+				return message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: oneLine`
+							Для выполнения команды \`${this.name}\` боту необходимо иметь следующие права:
+							${data.missing.map(perm => permissions[perm]).join(', ')}
+						`
+					}
+				});
 			}
 			case 'throttling': {
-				return message.reply(oneLine`
-					Для повторного выполнения команды \`${this.name}\`
-					вам необходимо подождать ${data.remaining.toFixed(1)} секунд.
-				`);
+				return message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: oneLine`
+							Для повторного выполнения команды \`${this.name}\`
+							вам необходимо подождать ${data.remaining.toFixed(1)} секунд.
+						`
+					}
+				});
 			}
 			default:
 				return null;
@@ -335,7 +392,7 @@ class Command {
 
 	/**
 	 * Called when the command produces an error while running
-	 * @param {Error} err - Error that was thrown
+	 * @param {Error} error - Error that was thrown
 	 * @param {CommandMessage} message - Command message that the command is running from (see {@link Command#run})
 	 * @param {Object|string|string[]} args - Arguments for the command (see {@link Command#run})
 	 * @param {boolean} fromPattern - Whether the args are pattern matches (see {@link Command#run})
@@ -343,20 +400,27 @@ class Command {
 	 * (if applicable - see {@link Command#run})
 	 * @returns {Promise<?Message|?Array<Message>>}
 	 */
-	onError(err, message, args, fromPattern, result) { // eslint-disable-line no-unused-vars
+	onError(error, message, args, fromPattern, result) { // eslint-disable-line no-unused-vars
 		const owners = this.client.owners;
 		const ownerList = owners ? owners.map((usr, i) => {
 			const or = i === owners.length - 1 && owners.length > 1 ? 'или ' : '';
-			return `${or}${escapeMarkdown(usr.username)}#${usr.discriminator}`;
+			return `${or}\`${escapeMarkdown(usr.username)}#${usr.discriminator}\``;
 		}).join(owners.length > 2 ? ', ' : ' ') : '';
 
 		const invite = this.client.options.invite;
-		return message.reply(stripIndents`
-			При выполнении команды \`${this.name} произошла ошибка\`: \`${err.name}: ${err.message}\`
-			Трассировка стека: \`\`\`javascript
-			${err.stack}\`\`\`
-			Пожалуйста, свяжитесь с ${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
-		`);
+		return message.channel.send(`${message.author.toString()}`, {
+			embed: {
+				title: 'Ошибка',
+				color: 0xd32f2f,
+				description: stripIndents`
+					При выполнении команды **\`${this.name}\`** произошла ошибка:\n\`${error.name}: ${error.message}\`
+					Трассировка стека: \`\`\`javascript
+					${error.stack.replace(new RegExp(`${process.cwd()}`, 'g'), '$root')}\`\`\`${oneLine`
+						Пожалуйста, свяжитесь с ${ownerList || 'владельцем бота'}${invite ? ` на этом сервере: ${invite}` : '.'}
+					`}
+				`
+			}
+		});
 	}
 
 	/**
@@ -421,6 +485,7 @@ class Command {
 	 */
 	isUsable(message = null) {
 		if(!message) return this._globalEnabled;
+		if(this.dmOnly && message && message.guild) return false;
 		if(this.guildOnly && message && !message.guild) return false;
 		const hasPermission = this.hasPermission(message);
 		return this.isEnabledIn(message.guild) && hasPermission && typeof hasPermission !== 'string';
@@ -447,7 +512,7 @@ class Command {
 			cached = require.cache[cmdPath];
 			delete require.cache[cmdPath];
 			newCmd = require(cmdPath);
-		} catch(err) {
+		} catch(error) {
 			if(cached) require.cache[cmdPath] = cached;
 			try {
 				cmdPath = path.join(__dirname, this.groupID, `${this.memberName}.js`);
@@ -456,7 +521,7 @@ class Command {
 				newCmd = require(cmdPath);
 			} catch(err2) {
 				if(cached) require.cache[cmdPath] = cached;
-				if(err2.message.includes('Cannot find module')) throw err; else throw err2;
+				if(err2.message.includes('Cannot find module')) throw error; else throw err2;
 			}
 		}
 
@@ -539,6 +604,9 @@ class Command {
 			for(const perm of info.userPermissions) {
 				if(!permissions[perm]) throw new RangeError(`Invalid command userPermission: ${perm}`);
 			}
+		}
+		if(info.dmOnly && info.guildOnly) {
+			throw new RangeError('Command cannot be dmOnly and guildOnly.');
 		}
 		if(info.throttling) {
 			if(typeof info.throttling !== 'object') throw new TypeError('Command throttling must be an Object.');

@@ -13,13 +13,17 @@ module.exports = class UnknownCommandCommand extends Command {
 		});
 	}
 
-	run(msg) {
-		return msg.reply(
-			`Неизвестная команда. Напишите ${msg.anyUsage(
-				'help',
-				msg.guild ? undefined : null,
-				msg.guild ? undefined : null
-			)}, чтобы посмотреть список доступных команд.`
-		);
+	run(message) {
+		return message.channel.send(`${message.author.toString()}`, {
+			embed: {
+				title: 'Ошибка',
+				color: 0xd32f2f,
+				description: `Неизвестная команда. Напишите ${message.anyUsage(
+					'help',
+					message.guild ? undefined : null,
+					message.guild ? undefined : null
+				)}, чтобы посмотреть список доступных команд.`
+			}
+		});
 	}
 };

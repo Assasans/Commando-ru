@@ -12,6 +12,7 @@ class CommandoClient extends discord.Client {
 	 * Options for a CommandoClient
 	 * @typedef {ClientOptions} CommandoClientOptions
 	 * @property {string} [commandPrefix=!] - Default command prefix
+	 * @property {string|undefined|null} [commandsLink] - Link to website with commands
 	 * @property {number} [commandEditableDuration=30] - Time in seconds that command messages should be editable
 	 * @property {boolean} [nonCommandEditable=true] - Whether messages without commands can be edited to a command
 	 * @property {string|string[]|Set<string>} [owner] - ID of the bot owner's Discord user, or multiple IDs
@@ -24,6 +25,9 @@ class CommandoClient extends discord.Client {
 	constructor(options = {}) {
 		if(typeof options.commandPrefix === 'undefined') options.commandPrefix = '!';
 		if(options.commandPrefix === null) options.commandPrefix = '';
+
+		if(typeof options.commandsLink === 'undefined') options.commandsLink = null;
+
 		if(typeof options.commandEditableDuration === 'undefined') options.commandEditableDuration = 30;
 		if(typeof options.nonCommandEditable === 'undefined') options.nonCommandEditable = true;
 		super(options);
@@ -51,6 +55,8 @@ class CommandoClient extends discord.Client {
 		 * @type {GuildSettingsHelper}
 		 */
 		this.settings = new GuildSettingsHelper(this, null);
+
+		this.commandsLink = options.commandsLink;
 
 		/**
 		 * Internal global command prefix, controlled by the {@link CommandoClient#commandPrefix} getter/setter

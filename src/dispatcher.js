@@ -129,7 +129,13 @@ class CommandDispatcher {
 				if(cmdMsg.command) {
 					if(!cmdMsg.command.isEnabledIn(message.guild)) {
 						if(!cmdMsg.command.unknown) {
-							responses = await cmdMsg.reply(`Команда \`${cmdMsg.command.name}\` отключена.`);
+							responses = await cmdMsg.channel.send(`${message.author.toString()}`, {
+								embed: {
+									title: 'Ошибка',
+									color: 0xd32f2f,
+									description: `Команда \`${cmdMsg.command.name}\` отключена.`
+								}
+							});
 						} else {
 							/**
 							 * Emitted when an unknown command is triggered

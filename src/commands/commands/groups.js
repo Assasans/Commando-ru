@@ -17,9 +17,9 @@ module.exports = class ListGroupsCommand extends Command {
 
 	run(msg) {
 		return msg.reply(stripIndents`
-			__**Группы: **__
+			**Группы:**
 			${this.client.registry.groups.map(grp =>
-				`**${grp.name}:** ${grp.isEnabledIn(msg.guild) ? 'Включена' : 'Отключена'}`
+				`${grp.name}: ${grp.isEnabledIn(msg.guild) ? 'Включена' : 'Отключена'}`
 			).join('\n')}
 		`);
 	}

@@ -26,7 +26,9 @@
 	"main": "src/index",
 	"types": "./typings/index.d.ts",
 	"dependencies": {
+		"@discordjs/opus": "^0.1.0",
 		"common-tags": "^1.8.0",
+		"discord.js": "^12.2.0",
 		"require-all": "^3.0.0"
 	},
 	"devDependencies": {
@@ -42,6 +44,6 @@
 		"sqlite": "^3.0.0"
 	},
 	"engines": {
-		"node": ">=8.6.0"
+		"node": ">=12.7.3"
 	}
 }

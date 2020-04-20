@@ -144,27 +144,27 @@ class Argument {
 
 	/**
 	 * Prompts the user and obtains the value for the argument
-	 * @param {CommandoMessage} msg - Message that triggered the command
+	 * @param {CommandoMessage} message - Message that triggered the command
 	 * @param {string} [val] - Pre-provided value for the argument
 	 * @param {number} [promptLimit=Infinity] - Maximum number of times to prompt for the argument
 	 * @return {Promise<ArgumentResult>}
 	 */
-	async obtain(msg, val, promptLimit = Infinity) {
-		let empty = this.isEmpty(val, msg);
+	async obtain(message, val, promptLimit = Infinity) {
+		let empty = this.isEmpty(val, message);
 		if(empty && this.default !== null) {
 			return {
-				value: typeof this.default === 'function' ? await this.default(msg, this) : this.default,
+				value: typeof this.default === 'function' ? await this.default(message, this) : this.default,
 				cancelled: null,
 				prompts: [],
 				answers: []
 			};
 		}
-		if(this.infinite) return this.obtainInfinite(msg, val, promptLimit);
+		if(this.infinite) return this.obtainInfinite(message, val, promptLimit);
 
 		const wait = this.wait > 0 && this.wait !== Infinity ? this.wait * 1000 : undefined;
 		const prompts = [];
 		const answers = [];
-		let valid = !empty ? await this.validate(val, msg) : false;
+		let valid = !empty ? await this.validate(val, message) : false;
 
 		while(!valid || typeof valid === 'string') {
 			/* eslint-disable no-await-in-loop */
@@ -178,16 +178,22 @@ class Argument {
 			}
 
 			// Prompt the user for a new value
-			prompts.push(await msg.reply(stripIndents`
-				${empty ? this.prompt : valid ? valid : `Вы указали неверный агрумент \`${this.label}\`. Попробуйте снова.`}
-				${oneLine`
-					Напишите \`cancel\` для отмены выполнения команды.
-					${wait ? `Выполнение команды будет автоматически отменено через ${this.wait} секунд.` : ''}
-				`}
-			`));
+			prompts.push(await message.channel.send(`${message.author.toString()}`, {
+				embed: {
+					title: 'Ошибка',
+					color: 0xd32f2f,
+					description: stripIndents`
+						${empty ? this.prompt : valid ? valid : `Вы указали неверный агрумент \`${this.label}\`. Попробуйте снова.`}
+						${oneLine`
+							Напишите \`cancel\` для отмены выполнения команды.
+							${wait ? `Выполнение команды будет автоматически отменено через ${this.wait} секунд.` : ''}
+						`}
+					`
+				}
+			}));
 
 			// Get the user's response
-			const responses = await msg.channel.awaitMessages(msg2 => msg2.author.id === msg.author.id, {
+			const responses = await message.channel.awaitMessages(msg2 => msg2.author.id === message.author.id, {
 				max: 1,
 				time: wait
 			});
@@ -215,13 +221,13 @@ class Argument {
 				};
 			}
 
-			empty = this.isEmpty(val, msg);
-			valid = await this.validate(val, msg);
+			empty = this.isEmpty(val, message);
+			valid = await this.validate(val, message);
 			/* eslint-enable no-await-in-loop */
 		}
 
 		return {
-			value: await this.parse(val, msg),
+			value: await this.parse(val, message),
 			cancelled: null,
 			prompts,
 			answers
@@ -230,13 +236,13 @@ class Argument {
 
 	/**
 	 * Prompts the user and obtains multiple values for the argument
-	 * @param {CommandoMessage} msg - Message that triggered the command
+	 * @param {CommandoMessage} message - Message that triggered the command
 	 * @param {string[]} [vals] - Pre-provided values for the argument
 	 * @param {number} [promptLimit=Infinity] - Maximum number of times to prompt for the argument
 	 * @return {Promise<ArgumentResult>}
 	 * @private
 	 */
-	async obtainInfinite(msg, vals, promptLimit = Infinity) { // eslint-disable-line complexity
+	async obtainInfinite(message, vals, promptLimit = Infinity) { // eslint-disable-line complexity
 		const wait = this.wait > 0 && this.wait !== Infinity ? this.wait * 1000 : undefined;
 		const results = [];
 		const prompts = [];
@@ -246,7 +252,7 @@ class Argument {
 		while(true) { // eslint-disable-line no-constant-condition
 			/* eslint-disable no-await-in-loop */
 			let val = vals && vals[currentVal] ? vals[currentVal] : null;
-			let valid = val ? await this.validate(val, msg) : false;
+			let valid = val ? await this.validate(val, message) : false;
 			let attempts = 0;
 
 			while(!valid || typeof valid === 'string') {
@@ -263,30 +269,42 @@ class Argument {
 				// Prompt the user for a new value
 				if(val) {
 					const escaped = escapeMarkdown(val).replace(/@/g, '@\u200b');
-					prompts.push(await msg.reply(stripIndents`
-						${valid ? valid : oneLine`
-							Вы указали неверный аргумент \`${this.label}\`,
-							"${escaped.length < 1800 ? escaped : '[too long to show]'}".
-							Попробуйте снова.
-						`}
-						${oneLine`
-							Напишите \`cancel\` для отмены выполнения команды или \`finish\` для завершения ввода аргументов.
-							${wait ? `Выполнение команды будет автоматически отменено через ${this.wait} секунд.` : ''}
-						`}
-					`));
+					prompts.push(await message.channel.send(`${message.author.toString()}`, {
+						embed: {
+							title: 'Ошибка',
+							color: 0xd32f2f,
+							description: stripIndents`
+								${valid ? valid : oneLine`
+									Вы указали неверный аргумент \`${this.label}\`,
+									"${escaped.length < 1800 ? escaped : '[too long to show]'}".
+									Попробуйте снова.
+								`}
+								${oneLine`
+									Напишите \`cancel\` для отмены выполнения команды или \`finish\` для завершения ввода аргументов.
+									${wait ? `Выполнение команды будет автоматически отменено через ${this.wait} секунд.` : ''}
+								`}
+							`
+						}
+					}));
 				} else if(results.length === 0) {
-					prompts.push(await msg.reply(stripIndents`
-						${this.prompt}
-						${oneLine`
-							Напишите \`cancel\` для отмены выполнения команды или \`finish\` для завершения ввода аргументов.
-							${wait ? `Если вы ничего не напишите - выполнение команды будет автоматически
-								отменено через ${this.wait} секунд.` : ''}
-						`}
-					`));
+					prompts.push(await message.channel.send(`${message.author.toString()}`, {
+						embed: {
+							title: `Команда "${message.command.name}"`,
+							color: 0x1976d2,
+							description: stripIndents`
+								${this.prompt}
+								${oneLine`
+									Напишите \`cancel\` для отмены выполнения команды или \`finish\` для завершения ввода аргументов.
+									${wait ? `Если вы ничего не напишите - выполнение команды будет автоматически
+										отменено через ${this.wait} секунд.` : ''}
+								`}
+							`
+						}
+					}));
 				}
 
 				// Get the user's response
-				const responses = await msg.channel.awaitMessages(msg2 => msg2.author.id === msg.author.id, {
+				const responses = await message.channel.awaitMessages(msg2 => msg2.author.id === message.author.id, {
 					max: 1,
 					time: wait
 				});
@@ -323,10 +341,10 @@ class Argument {
 					};
 				}
 
-				valid = await this.validate(val, msg);
+				valid = await this.validate(val, message);
 			}
 
-			results.push(await this.parse(val, msg));
+			results.push(await this.parse(val, message));
 
 			if(vals) {
 				currentVal++;
@@ -346,11 +364,11 @@ class Argument {
 	/**
 	 * Checks if a value is valid for the argument
 	 * @param {string} val - Value to check
-	 * @param {CommandoMessage} msg - Message that triggered the command
+	 * @param {CommandoMessage} message - Message that triggered the command
 	 * @return {boolean|string|Promise<boolean|string>}
 	 */
-	validate(val, msg) {
-		const valid = this.validator ? this.validator(val, msg, this) : this.type.validate(val, msg, this);
+	validate(val, message) {
+		const valid = this.validator ? this.validator(val, message, this) : this.type.validate(val, message, this);
 		if(!valid || typeof valid === 'string') return this.error || valid;
 		if(valid instanceof Promise) return valid.then(vld => !vld || typeof vld === 'string' ? this.error || vld : vld);
 		return valid;
@@ -359,23 +377,23 @@ class Argument {
 	/**
 	 * Parses a value string into a proper value for the argument
 	 * @param {string} val - Value to parse
-	 * @param {CommandoMessage} msg - Message that triggered the command
+	 * @param {CommandoMessage} message - Message that triggered the command
 	 * @return {*|Promise<*>}
 	 */
-	parse(val, msg) {
-		if(this.parser) return this.parser(val, msg, this);
-		return this.type.parse(val, msg, this);
+	parse(val, message) {
+		if(this.parser) return this.parser(val, message, this);
+		return this.type.parse(val, message, this);
 	}
 
 	/**
 	 * Checks whether a value for the argument is considered to be empty
 	 * @param {string} val - Value to check for emptiness
-	 * @param {CommandoMessage} msg - Message that triggered the command
+	 * @param {CommandoMessage} message - Message that triggered the command
 	 * @return {boolean}
 	 */
-	isEmpty(val, msg) {
-		if(this.emptyChecker) return this.emptyChecker(val, msg, this);
-		if(this.type) return this.type.isEmpty(val, msg, this);
+	isEmpty(val, message) {
+		if(this.emptyChecker) return this.emptyChecker(val, message, this);
+		if(this.type) return this.type.isEmpty(val, message, this);
 		if(Array.isArray(val)) return val.length === 0;
 		return !val;
 	}

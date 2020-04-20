@@ -132,7 +132,7 @@ module.exports = Structures.extend('Message', Message => {
 			}
 
 			// Make sure the command is usable in this context
-			if(this.command.guildOnly && !this.guild) {
+			if(this.command.dmOnly && this.guild) {
 				/**
 				 * Emitted when a command is prevented from running
 				 * @event CommandoClient#commandBlock
@@ -146,6 +146,11 @@ module.exports = Structures.extend('Message', Message => {
 				 * - throttling: `throttle` ({@link Object}), `remaining` ({@link number}) time in seconds
 				 * - clientPermissions: `missing` ({@link Array}<{@link string}>) permission names
 				 */
+				this.client.emit('commandBlock', this, 'dmOnly');
+				return this.command.onBlock(this, 'dmOnly');
+			}
+
+			if(this.command.guildOnly && !this.guild) {
 				this.client.emit('commandBlock', this, 'guildOnly');
 				return this.command.onBlock(this, 'guildOnly');
 			}
@@ -194,8 +199,8 @@ module.exports = Structures.extend('Message', Message => {
 				collResult = await this.command.argsCollector.obtain(this, provided);
 				if(collResult.cancelled) {
 					if(collResult.prompts.length === 0) {
-						const err = new CommandFormatError(this);
-						return this.reply(err.message);
+						const error = new CommandFormatError(this);
+						return this.reply(error.message);
 					}
 					/**
 					 * Emitted when a command is cancelled (either by typing 'cancel' or not responding in time)
@@ -207,7 +212,13 @@ module.exports = Structures.extend('Message', Message => {
 					 * (if applicable - see {@link Command#run})
 					 */
 					this.client.emit('commandCancel', this.command, collResult.cancelled, this, collResult);
-					return this.reply('Cancelled command.');
+					return this.channel.send(`${this.author.toString()}`, {
+						embed: {
+							title: `Команда "${this.command.name}"`,
+							color: 0x1976d2,
+							description: `Выполнение команды \`${this.command.name}\` отменено.`
+						}
+					});
 				}
 				args = collResult.values;
 			}
@@ -241,24 +252,24 @@ module.exports = Structures.extend('Message', Message => {
 					`);
 				}
 				return retVal;
-			} catch(err) {
+			} catch(error) {
 				/**
 				 * Emitted when a command produces an error while running
 				 * @event CommandoClient#commandError
 				 * @param {Command} command - Command that produced an error
-				 * @param {Error} err - Error that was thrown
+				 * @param {Error} error - Error that was thrown
 				 * @param {CommandoMessage} message - Command message that the command is running from (see {@link Command#run})
 				 * @param {Object|string|string[]} args - Arguments for the command (see {@link Command#run})
 				 * @param {boolean} fromPattern - Whether the args are pattern matches (see {@link Command#run})
 				 * @param {?ArgumentCollectorResult} result - Result from obtaining the arguments from the collector
 				 * (if applicable - see {@link Command#run})
 				 */
-				this.client.emit('commandError', this.command, err, this, args, fromPattern, collResult);
+				this.client.emit('commandError', this.command, error, this, args, fromPattern, collResult);
 				if(this.channel.typingCount > typingCount) this.channel.stopTyping();
-				if(err instanceof FriendlyError) {
-					return this.reply(err.message);
+				if(error instanceof FriendlyError) {
+					return this.reply(error.message);
 				} else {
-					return this.command.onError(err, this, args, fromPattern, collResult);
+					return this.command.onError(error, this, args, fromPattern, collResult);
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 const { stripIndents, oneLine } = require('common-tags');
 const Command = require('../base');
 const { disambiguation } = require('../../util');
+const { Util } = require('discord.js');
 
 module.exports = class HelpCommand extends Command {
 	constructor(client) {
@@ -27,9 +28,9 @@ module.exports = class HelpCommand extends Command {
 		});
 	}
 
-	async run(msg, args) { // eslint-disable-line complexity
+	async run(message, args) { // eslint-disable-line complexity
 		const groups = this.client.registry.groups;
-		const commands = this.client.registry.findCommands(args.command, false, msg);
+		const commands = this.client.registry.findCommands(args.command, false, message);
 		const showAll = args.command && args.command.toLowerCase() === 'all';
 		if(args.command && !showAll) {
 			if(commands.length === 1) {
@@ -40,7 +41,7 @@ module.exports = class HelpCommand extends Command {
 						${commands[0].nsfw ? ' (NSFW)' : ''}
 					`}
 
-					**Формат:** ${msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`)}
+					**Формат:** ${message.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`)}
 				`;
 				if(commands[0].aliases.length > 0) help += `\n**Альтернативные названия:** ${commands[0].aliases.join(', ')}`;
 				help += `\n${oneLine`
@@ -52,74 +53,118 @@ module.exports = class HelpCommand extends Command {
 
 				const messages = [];
 				try {
-					messages.push(await msg.direct(help));
-					if(msg.channel.type !== 'dm') {
-						messages.push(await msg.reply(oneLine`
-							Успешно отправлено личное сообщение с подробной информацией про команду.
-						`));
-					}
-				} catch(err) {
-					messages.push(await msg.reply(oneLine`
-						Не удалось отпраить личное сообщение с подробной информацией про команду.
-						Возможно у вас отключены ЛС от участников сервера.
+					messages.push(await message.channel.send(`${message.author.toString()}`, {
+						embed: {
+							title: 'Список доступных команд',
+							color: 0x1976d2,
+							description: help
+						}
+					}));
+				} catch(error) {
+					messages.push(await message.reply(oneLine`
+						Не удалось отпраить сообщение с подробной информацией про команду.
 					`));
 				}
 				return messages;
 			} else if(commands.length > 15) {
-				return msg.reply('Найдено несколько команд. Пожалуйста, укажите более точное название.');
+				return message.reply('Найдено несколько команд. Пожалуйста, укажите более точное название.');
 			} else if(commands.length > 1) {
-				return msg.reply(disambiguation(commands, 'commands'));
+				return message.reply(disambiguation(commands, 'commands'));
 			} else {
-				return msg.reply(
-					`Не удалось распознать команду. Напишите ${msg.usage(
-						null, msg.channel.type === 'dm' ? null : undefined, msg.channel.type === 'dm' ? null : undefined
+				return message.reply(
+					`Не удалось найти команду. Напишите ${message.usage(
+						null, message.channel.type === 'dm' ? null : undefined, message.channel.type === 'dm' ? null : undefined
 					)}, чтобы посмотреть список доступных команд.`
 				);
 			}
 		} else {
 			const messages = [];
 			try {
-				messages.push(await msg.direct(stripIndents`
-					${oneLine`
-						Для того, чтобы выполнить команду на ${msg.guild ? msg.guild.name : 'любом сервере'},
-						напишите ${Command.usage('command', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
-						Например: ${Command.usage('prefix', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
-					`}
-					${oneLine`
-						Для того, чтобы выполнить команду в ЛС - просто напишите
-						${Command.usage('command', null, null)} (без префикса).
-					`}
-
-					Напишите ${this.usage('<команда>', null, null)} для того, чтобы посмотреть подробую информацию про команду.
-					${oneLine`
-						Напишите ${this.usage('all', null, null)} для того, чтобы посмотреть список
-						__всех__ команд, а не только доступных вам.
-					`}
-
-					${oneLine`
-						**${showAll ? 'Список всех команд' : `Список команд доступных
-						${msg.guild ? `на сервере __${msg.guild}__` : 'в этом ЛС'}`}**
-					`}
-
-					${groups.filter(grp => grp.commands.some(cmd => !cmd.hidden && (showAll || cmd.isUsable(msg))))
-						.map(grp => stripIndents`
-							__${grp.name}__
-							${grp.commands.filter(cmd => !cmd.hidden && (showAll || cmd.isUsable(msg)))
-								.map(cmd => `**${cmd.name}:** ${cmd.description}${cmd.nsfw ? ' (NSFW)' : ''}`).join('\n')
-							}
-						`).join('\n\n')
+				messages.push(await message.author.send(undefined, {
+					embed: {
+						title: 'Список доступных команд',
+						color: 0x1976d2,
+						description: stripIndents`
+							${oneLine`
+								Для того, чтобы выполнить команду на ${message.guild ? message.guild.name : 'любом сервере'},
+								напишите
+								${Command.usage('command', message.guild ? message.guild.commandPrefix : null, this.client.user)}.
+								Например:
+								${Command.usage('prefix', message.guild ? message.guild.commandPrefix : null, this.client.user)}.
+							`}
+							${oneLine`
+								Для того, чтобы выполнить команду в ЛС - просто напишите
+								${Command.usage('command', null, null)} (без префикса).
+							`}
+		
+							Напишите ${this.usage('<команда>', message.guild ? message.guild.commandPrefix : null, this.client.user)}
+							для того, чтобы посмотреть подробую информацию про команду.
+							${oneLine`
+								Напишите ${this.usage('all', message.guild ? message.guild.commandPrefix : null, this.client.user)}
+								для того, чтобы посмотреть список
+								__всех__ команд, а не только доступных вам.
+							`}
+							
+							${oneLine`
+								**${showAll ? 'Список всех команд' : `Список команд доступных
+								${message.guild ? `на сервере __${message.guild}__` : 'в этом ЛС'}`}**
+							`}
+						`
 					}
-				`, { split: true }));
-				if(msg.channel.type !== 'dm') {
-					messages.push(await msg.reply(oneLine`
-						Успешно отправлено личное сообщение со списком доступных команд.
-					`));
+				}));
+				if(message.channel.type !== 'dm') {
+					messages.push(await message.channel.send(`${message.author.toString()}`, {
+						embed: {
+							title: 'Список доступных команд',
+							color: 0x1976d2,
+							description: stripIndents`
+								Сообщение со списком доступных команд отправлено вам в личные сообщения.
+								${this.client.commandsLink ?
+									`Также можете посмотреть список команд на сайте <${this.client.commandsLink}>` : ''
+								}
+							`
+						}
+					}));
 				}
-			} catch(err) {
-				messages.push(await msg.reply(oneLine`
-					Не удалось отпраить личное сообщение с списком команд.
-					Возможно у вас отключены ЛС от участников сервера.
-				`));
+				Util.splitMessage(groups
+					.filter(group => group.commands.some(command =>
+						!command.hidden &&
+						command.groupID !== 'hidden' &&
+						(showAll || command.isUsable(message))
+					))
+					.map(group => stripIndents`
+						__${group.name}__
+						${group.commands
+							.filter(command =>
+								!command.hidden &&
+								command.groupID !== 'hidden' &&
+								(showAll || command.isUsable(message))
+							)
+							.map(command => `**${command.name}:** ${command.description}${command.nsfw ? ' (NSFW)' : ''}`).join('\n')
+						}
+					`)
+				).forEach(async block => {
+					messages.push(await message.author.send(undefined, {
+						embed: {
+							title: 'Список доступных команд',
+							color: 0x1976d2,
+							description: stripIndents`				
+								${block}
+							`
+						}
+					}));
+				});
+			} catch(error) {
+				messages.push(await message.channel.send(`${message.author.toString()}`, {
+					embed: {
+						title: 'Ошибка',
+						color: 0xd32f2f,
+						description: oneLine`
+							Не удалось отпраить личное сообщение с списком команд.
+							Возможно у вас отключены личные сообщения от участников сервера.
+						`
+					}
+				}));
 			}
 			return messages;
 		}
