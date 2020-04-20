@@ -35,7 +35,7 @@
 
 NPM: `npm install @assasans/discord.js-commando`
 
-GitHub: `npm install Assasans/Commando-ru#djs-v11`
+GitHub: `npm install Assasans/Commando-ru#mastar`
 
 ## Документация
 
